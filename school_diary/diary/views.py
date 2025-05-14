@@ -349,6 +349,31 @@ def view_subject(request, subject_id):
         'attendance': attendance
     })
 
+@login_required
+@user_passes_test(is_teacher)
+def edit_grade(request, grade_id):
+    grade = get_object_or_404(Grade, id=grade_id)
+    if request.method == 'POST':
+        value = request.POST.get('grade')
+        date = request.POST.get('date')
+        if value and date:
+            grade.value = value
+            grade.date = date
+            grade.save()
+            messages.success(request, 'Оценка успешно изменена!')
+            return redirect('teacher_dashboard')
+    return render(request, 'diary/teacher/edit_grade.html', {'grade': grade})
+
+@login_required
+@user_passes_test(is_teacher)
+def delete_grade(request, grade_id):
+    grade = get_object_or_404(Grade, id=grade_id)
+    if request.method == 'POST':
+        grade.delete()
+        messages.success(request, 'Оценка удалена!')
+        return redirect('teacher_dashboard')
+    return render(request, 'diary/teacher/delete_grade.html', {'grade': grade})
+
 # Student views
 @login_required
 @user_passes_test(is_student)
