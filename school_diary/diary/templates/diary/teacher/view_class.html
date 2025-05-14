@@ -111,6 +111,67 @@
             </div>
         </div>
     </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Все оценки по ученикам</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Ученик</th>
+                            {% for subject in subjects %}
+                                <th>{{ subject.name }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in student_data %}
+                            <tr>
+                                <td>{{ data.student.user.get_full_name }}</td>
+                                {% for subject in subjects %}
+                                    <td>
+                                        {% for grade in data.student.grade_set.all %}
+                                            {% if grade.subject.id == subject.id %}
+                                                <button type="button" class="btn btn-outline-primary btn-sm mb-1" data-bs-toggle="modal" data-bs-target="#gradeActionModal{{ grade.id }}">
+                                                    {{ grade.value }}<br><small>{{ grade.date|date:'d.m.Y' }}</small>
+                                                </button>
+                                                <!-- Модальное окно для изменения/удаления -->
+                                                <div class="modal fade" id="gradeActionModal{{ grade.id }}" tabindex="-1" aria-labelledby="gradeActionModalLabel{{ grade.id }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="gradeActionModalLabel{{ grade.id }}">Оценка: {{ grade.value }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p><strong>Ученик:</strong> {{ grade.student.user.get_full_name }}</p>
+                                                                <p><strong>Предмет:</strong> {{ grade.subject.name }}</p>
+                                                                <p><strong>Дата:</strong> {{ grade.date|date:'d.m.Y' }}</p>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <a href="{% url 'edit_grade' grade.id %}" class="btn btn-warning">Изменить</a>
+                                                                <a href="{% url 'delete_grade' grade.id %}" class="btn btn-danger">Удалить</a>
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% empty %}
+                                            <span class="text-muted">-</span>
+                                        {% endfor %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
