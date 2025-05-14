@@ -1,22 +1,22 @@
 {% extends 'diary/base.html' %}
 
-{% block title %}Student Dashboard - School Diary{% endblock %}
+{% block title %}Панель ученика - Электронный дневник{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Student Dashboard</h2>
+    <h2 class="mb-4">Панель ученика</h2>
     
     <!-- Weekly Schedule -->
     <div class="card mb-4">
         <div class="card-header">
-            <h3 class="card-title">Weekly Schedule</h3>
+            <h3 class="card-title">Расписание на неделю</h3>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Lesson</th>
+                            <th>Урок</th>
                             {% for date in week_dates %}
                                 <th>{{ date|date:"l" }}<br>{{ date|date:"d.m.Y" }}</th>
                             {% endfor %}
@@ -40,12 +40,12 @@
                                                 {% endwith %}
                                                 {% if lesson.attendance %}
                                                     <span class="badge {% if lesson.attendance.status == 'present' %}bg-success{% elif lesson.attendance.status == 'late' %}bg-warning{% else %}bg-danger{% endif %} float-end">
-                                                        {{ lesson.attendance.get_status_display }}
+                                                        {% if lesson.attendance.status == 'present' %}Присутствовал{% elif lesson.attendance.status == 'late' %}Опоздал{% else %}Отсутствовал{% endif %}
                                                     </span>
                                                 {% endif %}
                                             </div>
                                         {% empty %}
-                                            <span class="text-muted">No lesson</span>
+                                            <span class="text-muted">Нет урока</span>
                                         {% endfor %}
                                     </td>
                                 {% endfor %}
@@ -60,16 +60,16 @@
     <!-- Recent Grades -->
     <div class="card mb-4">
         <div class="card-header">
-            <h3 class="card-title">Recent Grades</h3>
+            <h3 class="card-title">Последние оценки</h3>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Subject</th>
-                            <th>Grade</th>
-                            <th>Date</th>
+                            <th>Предмет</th>
+                            <th>Оценка</th>
+                            <th>Дата</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -81,7 +81,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center">No grades yet</td>
+                                <td colspan="3" class="text-center">Оценок пока нет</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -93,16 +93,16 @@
     <!-- Recent Attendance -->
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Recent Attendance</h3>
+            <h3 class="card-title">Последние посещения</h3>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Subject</th>
-                            <th>Status</th>
-                            <th>Date</th>
+                            <th>Предмет</th>
+                            <th>Статус</th>
+                            <th>Дата</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -111,14 +111,14 @@
                                 <td>{{ record.subject.name }}</td>
                                 <td>
                                     <span class="badge {% if record.status == 'present' %}bg-success{% elif record.status == 'late' %}bg-warning{% else %}bg-danger{% endif %}">
-                                        {{ record.get_status_display }}
+                                        {% if record.status == 'present' %}Присутствовал{% elif record.status == 'late' %}Опоздал{% else %}Отсутствовал{% endif %}
                                     </span>
                                 </td>
                                 <td>{{ record.date|date:"d.m.Y" }}</td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center">No attendance records yet</td>
+                                <td colspan="3" class="text-center">Нет записей о посещаемости</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -127,4 +127,8 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
+
+{% comment %}
+Требуется добавить фильтр ru_weekday для перевода дней недели, если не используется русская локализация Django.
+{% endcomment %} 

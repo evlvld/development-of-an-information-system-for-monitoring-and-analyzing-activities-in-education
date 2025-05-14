@@ -281,7 +281,6 @@ def add_grade_bulk(request, class_id, subject_id):
         # Process grades for each student
         for student in class_group.students.all():
             grade_value = request.POST.get(f'grade_{student.id}')
-            comment = request.POST.get(f'comment_{student.id}')
             
             if grade_value:  # Only create grade if a value was selected
                 Grade.objects.create(
@@ -289,11 +288,10 @@ def add_grade_bulk(request, class_id, subject_id):
                     subject=subject,
                     value=grade_value,
                     date=today,
-                    teacher=teacher,
-                    comment=comment
+                    teacher=teacher
                 )
         
-        messages.success(request, 'Grades added successfully!')
+        messages.success(request, 'Оценки успешно добавлены!')
         return redirect('teacher_dashboard')
     
     return redirect('teacher_dashboard')
