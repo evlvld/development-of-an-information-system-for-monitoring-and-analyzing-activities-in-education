@@ -1,0 +1,25 @@
+{% extends 'diary/base.html' %}
+
+{% block title %}Удалить урок{% endblock %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 500px;">
+    <div class="card">
+        <div class="card-header">
+            <h3>Удалить урок</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>Класс:</strong> {{ schedule.class_group.name }}</p>
+            <p><strong>Предмет:</strong> {{ schedule.subject.name }}</p>
+            <p><strong>День недели:</strong> {{ schedule.get_day_of_week_display }}</p>
+            <p><strong>Номер урока:</strong> {{ schedule.lesson_number }}</p>
+            <p>Вы уверены, что хотите удалить этот урок из расписания?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Удалить</button>
+                <a href="{% url 'view_schedule' %}" class="btn btn-secondary">Отмена</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

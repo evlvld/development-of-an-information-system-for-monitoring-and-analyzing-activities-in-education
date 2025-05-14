@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('logout/', views.logout_view, name='logout'),
     # Admin URLs
     path('customadmin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('customadmin/create-teacher/', views.create_teacher, name='create_teacher'),
@@ -22,6 +23,8 @@ urlpatterns = [
     path('teacher/subject/<int:subject_id>/', views.view_subject, name='view_subject'),
     path('teacher/edit-grade/<int:grade_id>/', views.edit_grade, name='edit_grade'),
     path('teacher/delete-grade/<int:grade_id>/', views.delete_grade, name='delete_grade'),
+    path('teacher/edit-or-add-schedule/', views.edit_or_add_schedule, name='edit_or_add_schedule'),
+    path('teacher/delete-schedule/<int:schedule_id>/', views.delete_schedule, name='delete_schedule'),
     
     # Student URLs
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),

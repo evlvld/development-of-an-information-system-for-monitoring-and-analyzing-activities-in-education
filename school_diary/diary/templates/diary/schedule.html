@@ -20,22 +20,117 @@
                 </tr>
             </thead>
             <tbody>
-                {% for lesson_row in schedule_matrix %}
+                {% for row in schedule_matrix %}
                     <tr>
                         <td>{{ forloop.counter }} lesson</td>
-                        {% for day_schedules in lesson_row %}
+                        {% for cell in row %}
                             <td>
-                                {% for schedule in day_schedules %}
-                                    <div class="mb-2">
-                                        <strong>{{ schedule.subject.name }}</strong><br>
-                                        Class: {{ schedule.class_group.name }}<br>
-                                        {% if user.teacher %}
-                                            Teacher: {{ schedule.teacher.user.get_full_name }}
-                                        {% endif %}
-                                    </div>
-                                {% empty %}
-                                    -
-                                {% endfor %}
+                                {% if user.teacher %}
+                                    {% if cell %}
+                                        {% for schedule in cell %}
+                                            <div class="mb-2">
+                                                <strong>{{ schedule.subject.name }}</strong><br>
+                                                Class: {{ schedule.class_group.name }}<br>
+                                                Teacher: {{ schedule.teacher.user.get_full_name }}<br>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-warning mb-1" data-bs-toggle="modal" data-bs-target="#editScheduleModal{{ schedule.id }}">
+                                                Изменить
+                                            </button>
+                                            <a href="{% url 'delete_schedule' schedule.id %}" class="btn btn-sm btn-danger mb-1">Удалить</a>
+                                            <!-- Модальное окно для изменения -->
+                                            <div class="modal fade" id="editScheduleModal{{ schedule.id }}" tabindex="-1" aria-labelledby="editScheduleModalLabel{{ schedule.id }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="editScheduleModalLabel{{ schedule.id }}">Изменить урок</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <form method="post" action="{% url 'edit_or_add_schedule' %}">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                                                            <input type="hidden" name="day_of_week" value="{{ schedule.day_of_week }}">
+                                                            <input type="hidden" name="lesson_number" value="{{ schedule.lesson_number }}">
+                                                            <div class="modal-body">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Класс</label>
+                                                                    <select name="class_group" class="form-select" required>
+                                                                        {% for class in classes %}
+                                                                            <option value="{{ class.id }}" {% if schedule.class_group.id == class.id %}selected{% endif %}>{{ class.name }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Предмет</label>
+                                                                    <select name="subject" class="form-select" required>
+                                                                        {% for subject in subjects %}
+                                                                            <option value="{{ subject.id }}" {% if schedule.subject.id == subject.id %}selected{% endif %}>{{ subject.name }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                                                <button type="submit" class="btn btn-primary">Сохранить</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <a href="#addScheduleModal{{ forloop.parentloop.counter }}_{{ forloop.counter }}" class="text-primary fw-bold" data-bs-toggle="modal" style="cursor:pointer;">Добавить</a>
+                                        <!-- Модальное окно для добавления -->
+                                        <div class="modal fade" id="addScheduleModal{{ forloop.parentloop.counter }}_{{ forloop.counter }}" tabindex="-1" aria-labelledby="addScheduleModalLabel{{ forloop.parentloop.counter }}_{{ forloop.counter }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="addScheduleModalLabel{{ forloop.parentloop.counter }}_{{ forloop.counter }}">Добавить урок</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form method="post" action="{% url 'edit_or_add_schedule' %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="day_of_week" value="{{ forloop.parentloop.counter }}">
+                                                        <input type="hidden" name="lesson_number" value="{{ forloop.counter }}">
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Класс</label>
+                                                                <select name="class_group" class="form-select" required>
+                                                                    {% for class in classes %}
+                                                                        <option value="{{ class.id }}">{{ class.name }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Предмет</label>
+                                                                <select name="subject" class="form-select" required>
+                                                                    {% for subject in subjects %}
+                                                                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                                            <button type="submit" class="btn btn-primary">Сохранить</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    {% if cell %}
+                                        {% for schedule in cell %}
+                                            <div class="mb-2">
+                                                <strong>{{ schedule.subject.name }}</strong><br>
+                                                Class: {{ schedule.class_group.name }}<br>
+                                                Teacher: {{ schedule.teacher.user.get_full_name }}<br>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% endif %}
                             </td>
                         {% endfor %}
                     </tr>

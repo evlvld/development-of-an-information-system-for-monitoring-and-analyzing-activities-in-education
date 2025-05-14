@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from datetime import datetime, timedelta
 from django.urls import reverse
+from django.contrib.auth import logout as auth_logout
+from django.views.decorators.http import require_POST
 
 @login_required
 def login_redirect(request):
@@ -185,11 +187,28 @@ def teacher_dashboard(request):
         teacher=teacher,
         day_of_week=today.weekday() + 1  # Convert Monday=0 to Monday=1
     ).order_by('lesson_number')
+
+    # Диапазоны для расписания
+    lesson_range = range(1, 9)  # 1-8 уроки
+    day_range = range(1, 7)     # 1-6 дни (Пн-Сб)
+
+    # Формируем матрицу расписания: schedule_matrix[lesson][day] = Schedule или None
+    schedule_matrix = []
+    for lesson_num in lesson_range:
+        row = []
+        for day in day_range:
+            cell = Schedule.objects.filter(teacher=teacher, day_of_week=day, lesson_number=lesson_num).first()
+            row.append(cell)
+        schedule_matrix.append(row)
     
     return render(request, 'diary/teacher/dashboard.html', {
         'classes': classes,
         'subjects': subjects,
-        'today_schedule': today_schedule
+        'today_schedule': today_schedule,
+        'teacher': teacher,
+        'lesson_range': lesson_range,
+        'day_range': day_range,
+        'schedule_matrix': schedule_matrix,
     })
 
 @login_required
@@ -267,6 +286,16 @@ def create_schedule(request):
         'classes': classes,
         'subjects': subjects
     })
+
+@login_required
+@user_passes_test(is_teacher)
+def delete_schedule(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id, teacher=request.user.teacher)
+    if request.method == 'POST':
+        schedule.delete()
+        messages.success(request, 'Урок удалён из расписания!')
+        return redirect('view_schedule')
+    return render(request, 'diary/teacher/delete_schedule.html', {'schedule': schedule})
 
 @login_required
 @user_passes_test(is_teacher)
@@ -375,6 +404,41 @@ def delete_grade(request, grade_id):
         return redirect('teacher_dashboard')
     return render(request, 'diary/teacher/delete_grade.html', {'grade': grade})
 
+@require_POST
+@login_required
+@user_passes_test(is_teacher)
+def edit_or_add_schedule(request):
+    teacher = request.user.teacher
+    schedule_id = request.POST.get('schedule_id')
+    class_group_id = request.POST.get('class_group')
+    subject_id = request.POST.get('subject')
+    day_of_week = request.POST.get('day_of_week')
+    lesson_number = request.POST.get('lesson_number')
+
+    class_group = get_object_or_404(Class, id=class_group_id)
+    subject = get_object_or_404(Subject, id=subject_id)
+
+    if schedule_id:
+        # Редактирование существующего урока
+        schedule = get_object_or_404(Schedule, id=schedule_id, teacher=teacher)
+        schedule.class_group = class_group
+        schedule.subject = subject
+        schedule.day_of_week = day_of_week
+        schedule.lesson_number = lesson_number
+        schedule.save()
+        messages.success(request, 'Урок успешно изменён!')
+    else:
+        # Добавление нового урока
+        Schedule.objects.create(
+            class_group=class_group,
+            subject=subject,
+            teacher=teacher,
+            day_of_week=day_of_week,
+            lesson_number=lesson_number
+        )
+        messages.success(request, 'Урок успешно добавлен!')
+    return redirect('teacher_dashboard')
+
 # Student views
 @login_required
 @user_passes_test(is_student)
@@ -435,17 +499,21 @@ def view_schedule(request):
     if is_teacher(request.user):
         teacher = Teacher.objects.get(user=request.user)
         schedules = Schedule.objects.filter(teacher=teacher).order_by('day_of_week', 'lesson_number')
-        # Create a schedule matrix
+        lesson_range = range(1, 9)
+        day_range = range(1, 7)
         schedule_matrix = []
-        for lesson in range(1, 9):  # 8 lessons
+        for lesson in lesson_range:
             row = []
-            for day in range(1, 7):  # Monday to Saturday
-                lesson_schedules = schedules.filter(day_of_week=day, lesson_number=lesson)
+            for day in day_range:
+                lesson_schedules = list(schedules.filter(day_of_week=day, lesson_number=lesson))
                 row.append(lesson_schedules)
             schedule_matrix.append(row)
-
+        classes = teacher.classes.all()
+        subjects = teacher.subjects.all()
         context = {
             'schedule_matrix': schedule_matrix,
+            'classes': classes,
+            'subjects': subjects,
         }
         return render(request, 'diary/schedule.html', context)
     elif is_student(request.user):
@@ -505,4 +573,8 @@ def home(request):
             return redirect('teacher_dashboard')
         elif hasattr(request.user, 'student'):
             return redirect('student_dashboard')
+    return redirect('login')
+
+def logout_view(request):
+    auth_logout(request)
     return redirect('login')
