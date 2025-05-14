@@ -1,0 +1,130 @@
+{% extends 'diary/base.html' %}
+
+{% block title %}{{ class_group.name }} - School Diary{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">{{ class_group.name }} ({{ class_group.year }})</h2>
+    
+    <div class="row">
+        <!-- Students List -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Students</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Recent Grades</th>
+                                    <th>Recent Attendance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in student_data %}
+                                    <tr>
+                                        <td>{{ data.student.user.get_full_name }}</td>
+                                        <td>
+                                            {% for grade in data.grades %}
+                                                <span class="badge bg-primary">{{ grade.subject.name }}: {{ grade.value }}</span>
+                                            {% empty %}
+                                                <span class="text-muted">No grades yet</span>
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {% for record in data.attendance %}
+                                                <span class="badge {% if record.status == 'present' %}bg-success{% elif record.status == 'late' %}bg-warning{% else %}bg-danger{% endif %}">
+                                                    {{ record.subject.name }}: {{ record.get_status_display }}
+                                                </span>
+                                            {% empty %}
+                                                <span class="text-muted">No attendance records</span>
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#gradeModal{{ data.student.id }}">
+                                                    Add Grade
+                                                </button>
+                                                <a href="{% url 'mark_attendance' class_group.id data.student.id %}" class="btn btn-info btn-sm">
+                                                    Mark Attendance
+                                                </a>
+                                            </div>
+
+                                            <!-- Grade Modal -->
+                                            <div class="modal fade" id="gradeModal{{ data.student.id }}" tabindex="-1" aria-labelledby="gradeModalLabel{{ data.student.id }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="gradeModalLabel{{ data.student.id }}">
+                                                                Add Grade for {{ data.student.user.get_full_name }}
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <form action="{% url 'add_grade' %}" method="POST" id="gradeForm{{ data.student.id }}">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="student_id" value="{{ data.student.id }}">
+                                                            <div class="modal-body">
+                                                                <div class="mb-3">
+                                                                    <label for="subject" class="form-label">Subject</label>
+                                                                    <select name="subject" id="subject{{ data.student.id }}" class="form-select" required>
+                                                                        <option value="">Select subject</option>
+                                                                        {% for subject in subjects %}
+                                                                            <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="date" class="form-label">Date</label>
+                                                                    <input type="date" name="date" id="date{{ data.student.id }}" class="form-control" required value="{{ today|date:'Y-m-d' }}">
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="grade" class="form-label">Grade</label>
+                                                                    <select name="grade" id="grade" class="form-select" required>
+                                                                        <option value="">Select grade</option>
+                                                                        <option value="5">5</option>
+                                                                        <option value="4">4</option>
+                                                                        <option value="3">3</option>
+                                                                        <option value="2">2</option>
+                                                                        <option value="1">1</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                <button type="submit" class="btn btn-primary">Save Grade</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function validateForm(studentId) {
+    const subjectId = document.getElementById('subject' + studentId).value;
+    if (!subjectId) {
+        alert('Please select a subject');
+        return false;
+    }
+    const form = document.getElementById('gradeForm' + studentId);
+    form.action = `/teacher/add-grade/${studentId}/${subjectId}/`;
+    return true;
+}
+</script>
+{% endblock %} 

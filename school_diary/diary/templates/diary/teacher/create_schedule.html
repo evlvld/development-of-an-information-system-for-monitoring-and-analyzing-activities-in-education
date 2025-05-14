@@ -1,0 +1,67 @@
+{% extends 'diary/base.html' %}
+
+{% block title %}Create Schedule - School Diary{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Create New Schedule</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="class_group" class="form-label">Class</label>
+                        <select class="form-select" id="class_group" name="class_group" required>
+                            <option value="">Select a class</option>
+                            {% for class in classes %}
+                                <option value="{{ class.id }}">{{ class.name }} ({{ class.year }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <select class="form-select" id="subject" name="subject" required>
+                            <option value="">Select a subject</option>
+                            {% for subject in subjects %}
+                                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="day_of_week" class="form-label">Day of Week</label>
+                        <select class="form-select" id="day_of_week" name="day_of_week" required>
+                            <option value="1">Monday</option>
+                            <option value="2">Tuesday</option>
+                            <option value="3">Wednesday</option>
+                            <option value="4">Thursday</option>
+                            <option value="5">Friday</option>
+                            <option value="6">Saturday</option>
+                            <option value="7">Sunday</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lesson_number" class="form-label">Lesson Number</label>
+                        <select class="form-select" id="lesson_number" name="lesson_number" required>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Create Schedule</button>
+                        <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

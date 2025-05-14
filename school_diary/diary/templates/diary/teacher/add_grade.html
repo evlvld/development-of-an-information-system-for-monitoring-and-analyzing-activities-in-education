@@ -1,0 +1,38 @@
+{% extends 'diary/base.html' %}
+
+{% block title %}Add Grade - School Diary{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Add Grade - {{ subject.name }}</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="value" class="form-label">Grade</label>
+                        <select class="form-select" id="value" name="value" required>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Add Grade</button>
+                        <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

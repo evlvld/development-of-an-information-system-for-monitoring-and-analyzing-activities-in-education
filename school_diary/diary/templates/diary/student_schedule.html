@@ -1,0 +1,60 @@
+{% extends 'diary/base.html' %}
+
+{% block title %}Weekly Schedule - School Diary{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Weekly Schedule</h2>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    {% for date in week_dates %}
+                        <th>
+                            {{ date|date:"l" }}<br>
+                            <small class="text-muted">{{ date|date:"d.m.Y" }}</small>
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for lesson_row in weekly_schedule %}
+                    <tr>
+                        <td>{{ forloop.counter }} lesson</td>
+                        {% for day_data in lesson_row %}
+                            <td>
+                                {% for data in day_data %}
+                                    <div class="mb-2 p-2 {% if data.attendance.status == 'absent' %}bg-danger text-white{% elif data.attendance.status == 'late' %}bg-warning{% else %}bg-light{% endif %}">
+                                        <strong>{{ data.schedule.subject.name }}</strong><br>
+                                        <small>
+                                            {% if data.grade %}
+                                                Grade: {{ data.grade.value }}<br>
+                                            {% endif %}
+                                            {% if data.attendance %}
+                                                Attendance: {{ data.attendance.get_status_display }}<br>
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                {% empty %}
+                                    -
+                                {% endfor %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <h4>Legend:</h4>
+        <div class="d-flex gap-3">
+            <div class="bg-light p-2">Present</div>
+            <div class="bg-warning p-2">Late</div>
+            <div class="bg-danger text-white p-2">Absent</div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,26 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    # Admin URLs
+    path('customadmin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('customadmin/create-teacher/', views.create_teacher, name='create_teacher'),
+    path('customadmin/edit-teacher/<int:teacher_id>/', views.edit_teacher, name='edit_teacher'),
+    path('customadmin/create-student/', views.create_student, name='create_student'),
+    path('customadmin/create-class/', views.create_class, name='create_class'),
+    path('customadmin/create-lesson/', views.create_lesson, name='create_lesson'),
+    path('customadmin/create-subject/', views.create_subject, name='create_subject'),
+    
+    # Teacher URLs
+    path('teacher/dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
+    path('teacher/add-grade/', views.add_grade, name='add_grade'),
+    path('teacher/mark-attendance/<int:class_id>/<int:subject_id>/', views.mark_attendance, name='mark_attendance'),
+    path('teacher/add-grade-bulk/<int:class_id>/<int:subject_id>/', views.add_grade_bulk, name='add_grade_bulk'),
+    path('teacher/create-schedule/', views.create_schedule, name='create_schedule'),
+    path('teacher/class/<int:class_id>/', views.view_class, name='view_class'),
+    path('teacher/subject/<int:subject_id>/', views.view_subject, name='view_subject'),
+    
+    # Student URLs
+    path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
+    path('schedule/', views.view_schedule, name='view_schedule'),
+] 

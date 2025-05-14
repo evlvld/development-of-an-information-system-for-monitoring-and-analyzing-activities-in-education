@@ -1,0 +1,107 @@
+{% extends 'diary/base.html' %}
+
+{% block title %}{{ subject.name }} - School Diary{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">{{ subject.name }}</h2>
+    
+    <div class="row">
+        <!-- Classes Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Classes</h3>
+                </div>
+                <div class="card-body">
+                    {% if classes %}
+                        <div class="list-group">
+                            {% for class in classes %}
+                                <a href="{% url 'view_class' class.id %}" class="list-group-item list-group-item-action">
+                                    {{ class.name }} ({{ class.year }})
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No classes assigned to this subject.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Grades Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Grades</h3>
+                </div>
+                <div class="card-body">
+                    {% if grades %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Grade</th>
+                                        <th>Date</th>
+                                        <th>Comment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for grade in grades|slice:":10" %}
+                                        <tr>
+                                            <td>{{ grade.student.user.get_full_name }}</td>
+                                            <td>{{ grade.value }}</td>
+                                            <td>{{ grade.date }}</td>
+                                            <td>{{ grade.comment|default:"-" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No grades recorded yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Attendance Section -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Attendance</h3>
+                </div>
+                <div class="card-body">
+                    {% if attendance %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Class</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in attendance|slice:":10" %}
+                                        <tr class="{% if record.status == 'absent' %}table-danger{% elif record.status == 'late' %}table-warning{% endif %}">
+                                            <td>{{ record.student.user.get_full_name }}</td>
+                                            <td>{{ record.get_status_display }}</td>
+                                            <td>{{ record.date }}</td>
+                                            <td>{{ record.student.class_group.name }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No attendance records yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

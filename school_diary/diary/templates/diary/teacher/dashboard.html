@@ -1,0 +1,166 @@
+{% extends 'diary/base.html' %}
+
+{% block title %}Teacher Dashboard - School Diary{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Teacher Dashboard</h2>
+    
+    <div class="row">
+        <!-- Schedule Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Schedule</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'view_schedule' %}" class="btn btn-primary">View Schedule</a>
+                        <a href="{% url 'create_schedule' %}" class="btn btn-success">Create Schedule</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Classes Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">My Classes</h3>
+                </div>
+                <div class="card-body">
+                    {% if classes %}
+                        <div class="list-group">
+                            {% for class in classes %}
+                                <a href="{% url 'view_class' class.id %}" class="list-group-item list-group-item-action">
+                                    {{ class.name }} ({{ class.year }})
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No classes assigned yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Subjects Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">My Subjects</h3>
+                </div>
+                <div class="card-body">
+                    {% if subjects %}
+                        <div class="list-group">
+                            {% for subject in subjects %}
+                                <a href="{% url 'view_subject' subject.id %}" class="list-group-item list-group-item-action">
+                                    {{ subject.name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No subjects assigned yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Schedule Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Today's Schedule</h3>
+        </div>
+        <div class="card-body">
+            {% if today_schedule %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Lesson</th>
+                                <th>Class</th>
+                                <th>Subject</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lesson in today_schedule %}
+                                <tr>
+                                    <td>{{ lesson.lesson_number }}</td>
+                                    <td>{{ lesson.class_group.name }}</td>
+                                    <td>{{ lesson.subject.name }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#gradeModal{{ lesson.id }}">
+                                            Add Grades
+                                        </button>
+                                        <a href="{% url 'mark_attendance' lesson.class_group.id lesson.subject.id %}" class="btn btn-info btn-sm">
+                                            Mark Attendance
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                <!-- Grade Modal -->
+                                <div class="modal fade" id="gradeModal{{ lesson.id }}" tabindex="-1" aria-labelledby="gradeModalLabel{{ lesson.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="gradeModalLabel{{ lesson.id }}">
+                                                    Add Grades - {{ lesson.subject.name }} ({{ lesson.class_group.name }})
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form action="{% url 'add_grade_bulk' lesson.class_group.id lesson.subject.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Student</th>
+                                                                    <th>Grade</th>
+                                                                    <th>Comment</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {% for student in lesson.class_group.students.all %}
+                                                                    <tr>
+                                                                        <td>{{ student.user.get_full_name }}</td>
+                                                                        <td>
+                                                                            <select name="grade_{{ student.id }}" class="form-select">
+                                                                                <option value="">Select grade</option>
+                                                                                <option value="5">5</option>
+                                                                                <option value="4">4</option>
+                                                                                <option value="3">3</option>
+                                                                                <option value="2">2</option>
+                                                                                <option value="1">1</option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="text" name="comment_{{ student.id }}" class="form-control" placeholder="Optional comment">
+                                                                        </td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Save Grades</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No lessons scheduled for today.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,130 @@
+{% extends 'diary/base.html' %}
+
+{% block title %}Student Dashboard - School Diary{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Student Dashboard</h2>
+    
+    <!-- Weekly Schedule -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Weekly Schedule</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Lesson</th>
+                            {% for date in week_dates %}
+                                <th>{{ date|date:"l" }}<br>{{ date|date:"d.m.Y" }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in weekly_schedule %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                {% for day_data in row %}
+                                    <td>
+                                        {% for lesson in day_data %}
+                                            <div class="mb-2">
+                                                <strong>{{ lesson.schedule.subject.name }}</strong>
+                                                {% with all_grades=lesson.schedule.subject.grade_set.all %}
+                                                    {% for grade in all_grades %}
+                                                        {% if grade.student.id == user.student.id and grade.date == lesson.date %}
+                                                            <span class="badge bg-primary float-end">{{ grade.value }}</span>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endwith %}
+                                                {% if lesson.attendance %}
+                                                    <span class="badge {% if lesson.attendance.status == 'present' %}bg-success{% elif lesson.attendance.status == 'late' %}bg-warning{% else %}bg-danger{% endif %} float-end">
+                                                        {{ lesson.attendance.get_status_display }}
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        {% empty %}
+                                            <span class="text-muted">No lesson</span>
+                                        {% endfor %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Grades -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Recent Grades</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Grade</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for grade in grades %}
+                            <tr>
+                                <td>{{ grade.subject.name }}</td>
+                                <td>{{ grade.value }}</td>
+                                <td>{{ grade.date|date:"d.m.Y" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No grades yet</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Attendance -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Recent Attendance</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in attendance_list %}
+                            <tr>
+                                <td>{{ record.subject.name }}</td>
+                                <td>
+                                    <span class="badge {% if record.status == 'present' %}bg-success{% elif record.status == 'late' %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ record.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ record.date|date:"d.m.Y" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No attendance records yet</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
