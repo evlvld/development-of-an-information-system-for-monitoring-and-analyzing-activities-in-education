@@ -85,3 +85,15 @@ class Schedule(models.Model):
             7: 'Sunday'
         }
         return days.get(self.day_of_week, 'Unknown')
+
+class Homework(models.Model):
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    class_group = models.ForeignKey(Class, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    due_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.class_group}) до {self.due_date}"

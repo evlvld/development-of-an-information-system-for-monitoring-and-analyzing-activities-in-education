@@ -1,0 +1,97 @@
+{% extends 'diary/base.html' %}
+
+{% block title %}Домашние задания - Электронный дневник{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Мои домашние задания</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Добавить домашнее задание</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="title">Тема</label>
+                        <input type="text" class="form-control" id="title" name="title" required placeholder="Введите тему" title="Тема домашнего задания">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="class_group">Класс</label>
+                        <select class="form-select" id="class_group" name="class_group" required title="Выберите класс">
+                            <option value="">Выберите класс</option>
+                            {% for class in classes %}
+                                <option value="{{ class.id }}">{{ class.name }} ({{ class.year }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="lesson">Урок</label>
+                        <select class="form-select" id="lesson" name="lesson" required title="Выберите урок">
+                            <option value="">Выберите урок</option>
+                            {% for lesson in lessons %}
+                                <option value="{{ lesson.id }}">{{ lesson.name }} ({{ lesson.subject.name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="due_date">Срок сдачи</label>
+                        <input type="date" class="form-control" id="due_date" name="due_date" required title="Срок сдачи">
+                    </div>
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label" for="description">Описание</label>
+                        <textarea class="form-control" id="description" name="description" rows="2" placeholder="Описание задания" title="Описание задания"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Добавить</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Список домашних заданий</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Тема</th>
+                            <th>Класс</th>
+                            <th>Урок</th>
+                            <th>Срок сдачи</th>
+                            <th>Описание</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hw in homeworks %}
+                            <tr>
+                                <td>{{ hw.title }}</td>
+                                <td>{{ hw.class_group }}</td>
+                                <td>{{ hw.lesson }}</td>
+                                <td>{{ hw.due_date|date:"d.m.Y" }}</td>
+                                <td>{{ hw.description|default:"-" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">Домашних заданий пока нет</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

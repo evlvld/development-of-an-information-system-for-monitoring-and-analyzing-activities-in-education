@@ -439,6 +439,42 @@ def edit_or_add_schedule(request):
         messages.success(request, 'Урок успешно добавлен!')
     return redirect('teacher_dashboard')
 
+@login_required
+@user_passes_test(is_teacher)
+def teacher_homework_list(request):
+    teacher = request.user.teacher
+    homeworks = Homework.objects.filter(teacher=teacher).order_by('-due_date')
+    classes = teacher.classes.all()
+    lessons = Lesson.objects.filter(subject__in=teacher.subjects.all())
+
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        due_date = request.POST.get('due_date')
+        class_group_id = request.POST.get('class_group')
+        lesson_id = request.POST.get('lesson')
+        if title and due_date and class_group_id and lesson_id:
+            class_group = get_object_or_404(Class, id=class_group_id)
+            lesson = get_object_or_404(Lesson, id=lesson_id)
+            Homework.objects.create(
+                lesson=lesson,
+                class_group=class_group,
+                teacher=teacher,
+                title=title,
+                description=description,
+                due_date=due_date
+            )
+            messages.success(request, 'Домашнее задание успешно добавлено!')
+            return redirect('teacher_homework_list')
+        else:
+            messages.error(request, 'Пожалуйста, заполните все обязательные поля!')
+
+    return render(request, 'diary/teacher/homework_list.html', {
+        'homeworks': homeworks,
+        'classes': classes,
+        'lessons': lessons
+    })
+
 # Student views
 @login_required
 @user_passes_test(is_student)

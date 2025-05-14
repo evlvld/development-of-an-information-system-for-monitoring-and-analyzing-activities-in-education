@@ -25,6 +25,7 @@ urlpatterns = [
     path('teacher/delete-grade/<int:grade_id>/', views.delete_grade, name='delete_grade'),
     path('teacher/edit-or-add-schedule/', views.edit_or_add_schedule, name='edit_or_add_schedule'),
     path('teacher/delete-schedule/<int:schedule_id>/', views.delete_schedule, name='delete_schedule'),
+    path('teacher/homework/', views.teacher_homework_list, name='teacher_homework_list'),
     
     # Student URLs
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
