@@ -5,6 +5,7 @@ from .models import *
 from django.contrib.auth.models import User
 from django.db.models import Q
 from datetime import datetime, timedelta
+from django.urls import reverse
 
 @login_required
 def login_redirect(request):
@@ -495,3 +496,13 @@ def view_schedule(request):
     else:
         messages.error(request, 'You do not have permission to view schedules.')
         return redirect('login')
+
+def home(request):
+    if request.user.is_authenticated:
+        if request.user.is_staff:
+            return redirect('admin_dashboard')
+        elif hasattr(request.user, 'teacher'):
+            return redirect('teacher_dashboard')
+        elif hasattr(request.user, 'student'):
+            return redirect('student_dashboard')
+    return redirect('login')
