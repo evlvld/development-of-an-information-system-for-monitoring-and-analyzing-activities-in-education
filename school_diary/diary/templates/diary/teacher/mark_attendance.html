@@ -1,27 +1,27 @@
 {% extends 'diary/base.html' %}
 
-{% block title %}Mark Attendance - School Diary{% endblock %}
+{% block title %}Отметка посещаемости - {{ subject.name }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h3 class="text-center">Mark Attendance - {{ subject.name }}</h3>
+                <h3 class="text-center">Отметка посещаемости - {{ subject.name }}</h3>
             </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="date" class="form-label">Date</label>
-                        <input type="date" class="form-control" id="date" name="date" required>
+                        <label for="date" class="form-label">Дата</label>
+                        <input type="date" class="form-control" id="date" name="date" required placeholder="дд.мм.гггг">
                     </div>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Student</th>
-                                    <th>Status</th>
+                                    <th>Ученик</th>
+                                    <th>Статус</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -30,9 +30,9 @@
                                         <td>{{ student.user.get_full_name }}</td>
                                         <td>
                                             <select class="form-select" name="status_{{ student.id }}" required>
-                                                <option value="present">Present</option>
-                                                <option value="absent">Absent</option>
-                                                <option value="late">Late</option>
+                                                <option value="present">Присутствует</option>
+                                                <option value="absent">Отсутствует</option>
+                                                <option value="late">Опоздал</option>
                                             </select>
                                         </td>
                                     </tr>
@@ -41,8 +41,8 @@
                         </table>
                     </div>
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Save Attendance</button>
-                        <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Сохранить посещаемость</button>
+                        <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">Отмена</a>
                     </div>
                 </form>
             </div>

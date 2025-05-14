@@ -1,35 +1,35 @@
 {% extends 'diary/base.html' %}
 
-{% block title %}Edit Teacher - School Diary{% endblock %}
+{% block title %}Редактировать учителя - Электронный дневник{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h3 class="text-center">Edit Teacher</h3>
+                <h3 class="text-center">Редактировать учителя</h3>
             </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
+                        <label for="username" class="form-label">Имя пользователя</label>
                         <input type="text" class="form-control" id="username" value="{{ teacher.user.username }}" disabled>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password (leave blank to keep current)</label>
+                        <label for="password" class="form-label">Пароль (оставьте пустым, чтобы не менять)</label>
                         <input type="password" class="form-control" id="password" name="password">
                     </div>
                     <div class="mb-3">
-                        <label for="first_name" class="form-label">First Name</label>
+                        <label for="first_name" class="form-label">Имя</label>
                         <input type="text" class="form-control" id="first_name" name="first_name" value="{{ teacher.user.first_name }}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="last_name" class="form-label">Last Name</label>
+                        <label for="last_name" class="form-label">Фамилия</label>
                         <input type="text" class="form-control" id="last_name" name="last_name" value="{{ teacher.user.last_name }}" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Subjects</label>
+                        <label class="form-label">Предметы</label>
                         <div class="row">
                             {% for subject in subjects %}
                                 <div class="col-md-6">
@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Classes</label>
+                        <label class="form-label">Классы</label>
                         <div class="row">
                             {% for class in classes %}
                                 <div class="col-md-6">
@@ -61,8 +61,8 @@
                         </div>
                     </div>
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Отмена</a>
                     </div>
                 </form>
             </div>

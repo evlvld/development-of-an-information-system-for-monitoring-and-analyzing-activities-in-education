@@ -1,28 +1,28 @@
 {% extends 'diary/base.html' %}
 
-{% block title %}Schedule - School Diary{% endblock %}
+{% block title %}Расписание - Электронный дневник{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Schedule</h2>
+    <h2 class="mb-4">Расписание</h2>
     
     <div class="table-responsive">
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Time</th>
-                    <th>Monday</th>
-                    <th>Tuesday</th>
-                    <th>Wednesday</th>
-                    <th>Thursday</th>
-                    <th>Friday</th>
-                    <th>Saturday</th>
+                    <th>Время</th>
+                    <th>Понедельник</th>
+                    <th>Вторник</th>
+                    <th>Среда</th>
+                    <th>Четверг</th>
+                    <th>Пятница</th>
+                    <th>Суббота</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in schedule_matrix %}
                     <tr>
-                        <td>{{ forloop.counter }} lesson</td>
+                        <td>{{ forloop.counter }} урок</td>
                         {% for cell in row %}
                             <td>
                                 {% if user.teacher %}
@@ -30,8 +30,8 @@
                                         {% for schedule in cell %}
                                             <div class="mb-2">
                                                 <strong>{{ schedule.subject.name }}</strong><br>
-                                                Class: {{ schedule.class_group.name }}<br>
-                                                Teacher: {{ schedule.teacher.user.get_full_name }}<br>
+                                                Класс: {{ schedule.class_group.name }}<br>
+                                                Учитель: {{ schedule.teacher.user.get_full_name }}<br>
                                             </div>
                                             <button type="button" class="btn btn-sm btn-warning mb-1" data-bs-toggle="modal" data-bs-target="#editScheduleModal{{ schedule.id }}">
                                                 Изменить
@@ -123,8 +123,8 @@
                                         {% for schedule in cell %}
                                             <div class="mb-2">
                                                 <strong>{{ schedule.subject.name }}</strong><br>
-                                                Class: {{ schedule.class_group.name }}<br>
-                                                Teacher: {{ schedule.teacher.user.get_full_name }}<br>
+                                                Класс: {{ schedule.class_group.name }}<br>
+                                                Учитель: {{ schedule.teacher.user.get_full_name }}<br>
                                             </div>
                                         {% endfor %}
                                     {% else %}
